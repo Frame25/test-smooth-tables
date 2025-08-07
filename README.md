@@ -26,7 +26,7 @@ This project was created as part of a technical assessment for a hiring company.
 
 ## Project Structure
 
-The project follows a feature-based architecture:
+The project follows a feature-based architecture (loosely):
 
 ```
 src/
