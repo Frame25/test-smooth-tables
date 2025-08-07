@@ -1,69 +1,68 @@
-# React + TypeScript + Vite
+# Smooth Tables - Technical Assessment Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+This project was created as part of a technical assessment for a hiring company. The task was to develop a responsive interface for managing and displaying tables with various data types.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Requirements
 
-## Expanding the ESLint configuration
+### Technical Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React**: Used as the primary UI library (React 19)
+- **Redux**: Implemented with Redux Toolkit for state management
+- **TypeScript**: For type safety throughout the application
+- **ESLint & Prettier**: For code quality and consistent formatting
+- **Vite**: For fast development and optimized builds
+- **TailwindCSS**: For styling components
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Table Functionality
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- Create, view, and manage multiple tables
+- Support for different data types (text, number, boolean, select)
+- Responsive grid layout that adapts to screen size
+- Tables stretch to fill available width
+- Maximum of 3 tables per row on larger screens
+- Automatic resizing based on viewport
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+
+The project follows a feature-based architecture:
+
+```
+src/
+├── app/            # Application setup, store configuration
+├── entities/       # Business entities (tables, etc.)
+├── pages/          # Page components
+├── shared/         # Shared utilities, UI components
+└── widgets/        # Composite components
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Key Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Dynamic Tables**: Create and manage tables with different field types
+- **Responsive Layout**: Tables automatically adjust to fill the available space
+- **Mock Data**: Pre-generated sample data for demonstration purposes
+- **Type Safety**: Full TypeScript implementation
+- **Modern UI**: Clean, accessible interface with modern design patterns
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
 ```
+
+## Performance Optimizations
+
+The project includes several optimizations:
+
+- Chunk splitting for better loading performance
+- Vendor bundle separation
+- Optimized asset loading
+- Responsive design for all screen sizes
