@@ -16,11 +16,20 @@ const defaultOption: SelectOption = {
 
 export default function AddFieldSelectOption({ value, onChange }: AddFieldSelectOptionProps) {
   const [tempOption, setTempOption] = useState<SelectOption>(defaultOption);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAddOption = () => {
     if (!tempOption.value || !tempOption.label) return;
+    if (value.some((option) => option.value === tempOption.value)) {
+      setError('Option value already exists');
+      return;
+    }
     onChange([...value, tempOption]);
     setTempOption({ ...defaultOption });
+  };
+
+  const resetError = () => {
+    setError(null);
   };
 
   return (
@@ -46,14 +55,20 @@ export default function AddFieldSelectOption({ value, onChange }: AddFieldSelect
         type="text"
         className="max-w-1/2 shrink w-auto grow"
         value={tempOption.label}
-        onChange={(e) => setTempOption({ ...tempOption, label: e.target.value })}
+        onChange={(e) => {
+          setTempOption({ ...tempOption, label: e.target.value });
+          resetError();
+        }}
       />
       <Input
         placeholder="Type option value"
         type="text"
         className="max-w-1/2 shrink w-auto grow"
         value={tempOption.value}
-        onChange={(e) => setTempOption({ ...tempOption, value: e.target.value })}
+        onChange={(e) => {
+          setTempOption({ ...tempOption, value: e.target.value });
+          resetError();
+        }}
       />
 
       <Button
@@ -62,6 +77,8 @@ export default function AddFieldSelectOption({ value, onChange }: AddFieldSelect
         onClick={handleAddOption}>
         Add option
       </Button>
+
+      {error && <p className="text-red-500">{error}</p>}
     </div>
   );
 }
