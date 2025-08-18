@@ -11,6 +11,7 @@ import { Trash } from 'lucide-react';
 export function AddTableWidget() {
   const [tempTableName, setTempTableName] = useState('');
   const [tempTableDescription, setTempTableDescription] = useState('');
+  const [resetKey, setResetKey] = useState(0);
   const fields = useAppSelector((state) => state.tableCreate.fields);
   const dispatch = useAppDispatch();
   const isDisabled = !tempTableName || !fields.length;
@@ -23,6 +24,7 @@ export function AddTableWidget() {
     setTempTableName('');
     setTempTableDescription('');
     dispatch(clearTableCreate());
+    setResetKey((k) => k + 1);
   };
 
   return (
@@ -69,7 +71,7 @@ export function AddTableWidget() {
               </div>
             ))}
           </div>
-          <AddTableField />
+          <AddTableField key={resetKey} />
           <Button type="button" disabled={isDisabled} onClick={handleCreateTable}>
             Create
           </Button>
