@@ -57,7 +57,8 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
     }
   };
 
-  const handleInputBlur = () => {
+  const handleInputBlur = (e?: React.MouseEvent | React.FocusEvent) => {
+    e?.stopPropagation();
     setEditingCell(null);
   };
 
@@ -147,6 +148,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
               autoFocus
               defaultChecked={cellValue === 'true'}
               onChange={handleCheckboxChange}
+              onBlur={handleInputBlur}
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                   handleInputBlur();
@@ -156,22 +158,32 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
           );
         case 'select':
           return (
-            <Select defaultValue={cellValue as string} onValueChange={handleSelectChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select option" />
-              </SelectTrigger>
-              <SelectContent>
-                {field.options?.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                )) || []}
-              </SelectContent>
-            </Select>
+            <>
+              <div
+                className="left-0 top-0 w-full h-full z-10 fixed"
+                onClick={handleInputBlur}></div>
+              <Select defaultValue={cellValue as string} onValueChange={handleSelectChange}>
+                <SelectTrigger className="w-full z-20 relative">
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent className="z-20 relative">
+                  {field.options?.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
           );
         default:
           return cellValue as React.ReactNode;
       }
+    }
+
+    if (field.type === 'select') {
+      const option = field.options?.find((option) => option.value === cellValue);
+      return option?.label || cellValue;
     }
 
     return field.render ? field.render(cellValue) : (cellValue as React.ReactNode);
@@ -196,7 +208,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
             const target = e.target as HTMLElement;
             const cell = target.closest('td');
 
-            if (cell && !editingCell) {
+            if (cell) {
               // Find the data-row-index and data-field-key attributes
               const rowIndex = cell.getAttribute('data-row-index');
               const fieldKey = cell.getAttribute('data-field-key');

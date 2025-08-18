@@ -1,6 +1,12 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { ITable, ITableDraft, TableRowData, TableFieldsData } from './interfaces';
+import type {
+  ITable,
+  ITableDraft,
+  TableRowData,
+  TableFieldsData,
+  SelectOption,
+} from './interfaces';
 
 const initialState: { tables: ITable[] } = {
   tables: [],
@@ -16,7 +22,7 @@ const getDefaultValueForFieldType = (field: TableFieldsData[0]): string | number
     case 'boolean':
       return 'false';
     case 'select':
-      return field.options && field.options.length > 0 ? field.options[0] : '';
+      return field.options && field.options.length > 0 ? field.options[0].value : '';
     default:
       return '';
   }
@@ -94,15 +100,16 @@ export const tablesSlice = createSlice({
         tableId: string | number;
         rowIndex: number;
         fieldKey: string | number;
-        value: string | number | undefined;
+        value: string | number | SelectOption | undefined;
       }>
     ) => {
       const { tableId, rowIndex, fieldKey, value } = action.payload;
       const tableIndex = state.tables.findIndex((table) => table.id === tableId);
 
       if (tableIndex !== -1 && state.tables[tableIndex].rows[rowIndex]) {
+        const _value = typeof value === 'object' ? value.value : value;
         // Update the cell value
-        state.tables[tableIndex].rows[rowIndex][fieldKey] = value;
+        state.tables[tableIndex].rows[rowIndex][fieldKey] = _value;
       }
     },
   },

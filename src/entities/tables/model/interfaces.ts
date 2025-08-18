@@ -2,12 +2,17 @@ export type TableCellData = string | number | undefined;
 
 export type FieldTypes = 'text' | 'number' | 'boolean' | 'select';
 
+export type SelectOption = {
+  value: string;
+  label: string;
+};
+
 export type TableFieldData = {
   title: TableCellData;
   key: string | number;
   required?: boolean;
   type: FieldTypes;
-  options?: string[];
+  options?: SelectOption[];
   render?: (value: TableCellData) => React.ReactNode;
 };
 
