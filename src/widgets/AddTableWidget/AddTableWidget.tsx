@@ -4,11 +4,11 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { addTable, clearTableCreate, removeField } from '@/entities/tables/model';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import AddTableField from './AddTableField';
 import { Trash } from 'lucide-react';
 
-export function AddTableWidget() {
+export const AddTableWidget = memo(function AddTableWidget() {
   const [tempTableName, setTempTableName] = useState('');
   const [tempTableDescription, setTempTableDescription] = useState('');
   const [resetKey, setResetKey] = useState(0);
@@ -52,7 +52,7 @@ export function AddTableWidget() {
           />
           <div className="mb-4">
             {fields.map((field, index) => (
-              <div key={index} className="flex gap-2 not-first:border-t p-1 text-sm">
+              <div key={field.key ?? index} className="flex gap-2 not-first:border-t p-1 text-sm">
                 <div>{field.title}</div>
                 <div className="opacity-50">[{field.type}]</div>
                 {field.options?.length && (
@@ -79,4 +79,4 @@ export function AddTableWidget() {
       </PopoverContent>
     </Popover>
   );
-}
+});

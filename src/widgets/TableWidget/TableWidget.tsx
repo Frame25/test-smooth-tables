@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import {
   Table,
   TableHeader,
@@ -28,7 +28,7 @@ interface EditingCell {
   fieldKey: string | number;
 }
 
-export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slotTop }) => {
+const TableWidgetComp: React.FC<TableWidgetProps> = ({ table, className, slotTop }) => {
   const dispatch = useDispatch();
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
 
@@ -36,158 +36,166 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
     return <div>No table data available</div>;
   }
 
-  const handleAddRow = () => {
+  const handleAddRow = useCallback(() => {
     dispatch(addRowToTable(table.id));
-  };
+  }, [dispatch, table.id]);
 
-  const handleCellClick = (rowIndex: number, fieldKey: string | number) => {
+  const handleCellClick = useCallback((rowIndex: number, fieldKey: string | number) => {
     setEditingCell({ rowIndex, fieldKey });
-  };
+  }, []);
 
-  const handleCellValueChange = (value: string | number | undefined) => {
-    if (editingCell) {
-      dispatch(
-        updateTableCell({
-          tableId: table.id,
-          rowIndex: editingCell.rowIndex,
-          fieldKey: editingCell.fieldKey,
-          value,
-        })
-      );
-    }
-  };
+  const handleCellValueChange = useCallback(
+    (value: string | number | undefined) => {
+      if (editingCell) {
+        dispatch(
+          updateTableCell({
+            tableId: table.id,
+            rowIndex: editingCell.rowIndex,
+            fieldKey: editingCell.fieldKey,
+            value,
+          })
+        );
+      }
+    },
+    [dispatch, editingCell, table.id]
+  );
 
-  const handleInputBlur = (e?: React.MouseEvent | React.FocusEvent) => {
+  const handleInputBlur = useCallback((e?: React.MouseEvent | React.FocusEvent) => {
     e?.stopPropagation();
     setEditingCell(null);
-  };
+  }, []);
 
-  const handleSelectChange = (value: string) => {
-    if (editingCell) {
-      dispatch(
-        updateTableCell({
-          tableId: table.id,
-          rowIndex: editingCell.rowIndex,
-          fieldKey: editingCell.fieldKey,
-          value,
-        })
-      );
-      setEditingCell(null);
-    }
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editingCell) {
-      const value = e.target.checked ? 'true' : 'false';
-      dispatch(
-        updateTableCell({
-          tableId: table.id,
-          rowIndex: editingCell.rowIndex,
-          fieldKey: editingCell.fieldKey,
-          value,
-        })
-      );
-      setEditingCell(null);
-    }
-  };
-
-  const renderCellContent = (
-    rowIndex: number,
-    field: TableFieldData,
-    cellValue: string | number | undefined
-  ) => {
-    const isEditing =
-      editingCell && editingCell.rowIndex === rowIndex && editingCell.fieldKey === field.key;
-
-    if (isEditing) {
-      switch (field.type) {
-        case 'text':
-          return (
-            <Input
-              autoFocus
-              type="text"
-              defaultValue={cellValue as string}
-              onBlur={(e) => {
-                handleCellValueChange(e.target.value);
-                handleInputBlur();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleCellValueChange((e.target as HTMLInputElement).value);
-                  handleInputBlur();
-                } else if (e.key === 'Escape') {
-                  handleInputBlur();
-                }
-              }}
-            />
-          );
-        case 'number':
-          return (
-            <Input
-              autoFocus
-              type="number"
-              defaultValue={cellValue as number}
-              onBlur={(e) => {
-                handleCellValueChange(e.target.value ? Number(e.target.value) : 0);
-                handleInputBlur();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const value = (e.target as HTMLInputElement).value;
-                  handleCellValueChange(value ? Number(value) : 0);
-                  handleInputBlur();
-                } else if (e.key === 'Escape') {
-                  handleInputBlur();
-                }
-              }}
-            />
-          );
-        case 'boolean':
-          return (
-            <Checkbox
-              autoFocus
-              defaultChecked={cellValue === 'true'}
-              onChange={handleCheckboxChange}
-              onBlur={handleInputBlur}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  handleInputBlur();
-                }
-              }}
-            />
-          );
-        case 'select':
-          return (
-            <>
-              <div
-                className="left-0 top-0 w-full h-full z-10 fixed"
-                onClick={handleInputBlur}></div>
-              <Select defaultValue={cellValue as string} onValueChange={handleSelectChange}>
-                <SelectTrigger className="w-full z-20 relative">
-                  <SelectValue placeholder="Select option" />
-                </SelectTrigger>
-                <SelectContent className="z-20 relative">
-                  {field.options?.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </>
-          );
-        default:
-          return cellValue as React.ReactNode;
+  const handleSelectChange = useCallback(
+    (value: string) => {
+      if (editingCell) {
+        dispatch(
+          updateTableCell({
+            tableId: table.id,
+            rowIndex: editingCell.rowIndex,
+            fieldKey: editingCell.fieldKey,
+            value,
+          })
+        );
+        setEditingCell(null);
       }
-    }
+    },
+    [dispatch, editingCell, table.id]
+  );
 
-    if (field.type === 'select') {
-      const option = field.options?.find((option) => option.value === cellValue);
-      return option?.label || cellValue;
-    }
+  const handleCheckboxChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (editingCell) {
+        const value = e.target.checked ? 'true' : 'false';
+        dispatch(
+          updateTableCell({
+            tableId: table.id,
+            rowIndex: editingCell.rowIndex,
+            fieldKey: editingCell.fieldKey,
+            value,
+          })
+        );
+        setEditingCell(null);
+      }
+    },
+    [dispatch, editingCell, table.id]
+  );
 
-    return field.render ? field.render(cellValue) : (cellValue as React.ReactNode);
-  };
+  const renderCellContent = useCallback(
+    (rowIndex: number, field: TableFieldData, cellValue: string | number | undefined) => {
+      const isEditing =
+        editingCell && editingCell.rowIndex === rowIndex && editingCell.fieldKey === field.key;
+
+      if (isEditing) {
+        switch (field.type) {
+          case 'text':
+            return (
+              <Input
+                autoFocus
+                type="text"
+                defaultValue={cellValue as string}
+                onBlur={(e) => {
+                  handleCellValueChange(e.target.value);
+                  handleInputBlur();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCellValueChange((e.target as HTMLInputElement).value);
+                    handleInputBlur();
+                  } else if (e.key === 'Escape') {
+                    handleInputBlur();
+                  }
+                }}
+              />
+            );
+          case 'number':
+            return (
+              <Input
+                autoFocus
+                type="number"
+                defaultValue={cellValue as number}
+                onBlur={(e) => {
+                  handleCellValueChange(e.target.value ? Number(e.target.value) : 0);
+                  handleInputBlur();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const value = (e.target as HTMLInputElement).value;
+                    handleCellValueChange(value ? Number(value) : 0);
+                    handleInputBlur();
+                  } else if (e.key === 'Escape') {
+                    handleInputBlur();
+                  }
+                }}
+              />
+            );
+          case 'boolean':
+            return (
+              <Checkbox
+                autoFocus
+                defaultChecked={cellValue === 'true'}
+                onChange={handleCheckboxChange}
+                onBlur={handleInputBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    handleInputBlur();
+                  }
+                }}
+              />
+            );
+          case 'select':
+            return (
+              <>
+                <div
+                  className="left-0 top-0 w-full h-full z-10 fixed"
+                  onClick={handleInputBlur}></div>
+                <Select defaultValue={cellValue as string} onValueChange={handleSelectChange}>
+                  <SelectTrigger className="w-full z-20 relative">
+                    <SelectValue placeholder="Select option" />
+                  </SelectTrigger>
+                  <SelectContent className="z-20 relative">
+                    {field.options?.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            );
+          default:
+            return cellValue as React.ReactNode;
+        }
+      }
+
+      if (field.type === 'select') {
+        const option = field.options?.find((option) => option.value === cellValue);
+        return option?.label || cellValue;
+      }
+
+      return field.render ? field.render(cellValue) : (cellValue as React.ReactNode);
+    },
+    [editingCell, handleCellValueChange, handleInputBlur, handleSelectChange, handleCheckboxChange]
+  );
 
   return (
     <div className={className}>
@@ -251,3 +259,5 @@ export const TableWidget: React.FC<TableWidgetProps> = ({ table, className, slot
     </div>
   );
 };
+
+export const TableWidget = memo(TableWidgetComp);

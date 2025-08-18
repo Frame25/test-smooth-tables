@@ -2,7 +2,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import type { TableFieldData, FieldTypes, SelectOption } from '@/entities/tables/model/interfaces';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useAppDispatch } from '@/shared/lib/hooks';
 import { addField } from '@/entities/tables/model';
 import { transformToAlias } from '@/shared/lib/utils';
@@ -14,7 +14,7 @@ const defaultField: TableFieldData = {
   type: 'text',
 };
 
-export default function AddTableField() {
+export default memo(function AddTableField() {
   const dispatch = useAppDispatch();
   const [tempField, setTempField] = useState<TableFieldData>(defaultField);
 
@@ -62,4 +62,4 @@ export default function AddTableField() {
       )}
     </div>
   );
-}
+});
